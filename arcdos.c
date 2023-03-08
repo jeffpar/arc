@@ -1,13 +1,11 @@
 /*
- * $Header: /cvsroot/arc/arc/arcdos.c,v 1.3 2003/10/31 02:32:19 highlandsun Exp $
- */
-
-/*
  * ARC - Archive utility - ARCDOS
  * 
  * Version 1.44, created on 07/25/86 at 14:17:38
  * 
- * (C) COPYRIGHT 1985 by System Enhancement Associates; ALL RIGHTS RESERVED
+ * (C) COPYRIGHT 1985-87 by System Enhancement Associates.
+ * You may copy and distribute this program freely,
+ * under the terms of the General Public License.
  * 
  * By:  Thom Henderson
  * 
@@ -20,12 +18,7 @@
  * 
  * Language: Computer Innovations Optimizing C86
  */
-#include <stdio.h>
 #include "arc.h"
-
-#ifdef __CYGWIN__
-#  include <sys/time.h>
-#endif
 
 #if	MSDOS
 #include "fileio2.h"		/* needed for filehand */

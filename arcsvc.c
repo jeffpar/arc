@@ -1,12 +1,10 @@
-/*
- * $Header: /cvsroot/arc/arc/arcsvc.c,v 1.4 2005/10/09 01:38:22 highlandsun Exp $
- */
-
 /*  ARC - Archive utility - ARCSVC
 
     Version 2.23, created on 04/22/87 at 13:10:10
 
-(C) COPYRIGHT 1985-87 by System Enhancement Associates; ALL RIGHTS RESERVED
+    (C) COPYRIGHT 1985-87 by System Enhancement Associates.
+    You may copy and distribute this program freely,
+    under the terms of the General Public License.
 
     By:	 Thom Henderson
 
@@ -16,25 +14,15 @@
     Language:
 	 Computer Innovations Optimizing C86
 */
-#include <stdio.h>
-#include <sys/types.h>
-#include <sys/stat.h>
-#include <fcntl.h>
 #include "arc.h"
-#if	_MTS
-#include <mts.h>
-#endif
-
 #include "proto.h"
 
-VOID	arcdie(), setstamp();
-int	unlink();
+VOID	setstamp();
 
 VOID
-openarc(chg)			/* open archive */
-	int             chg;	/* true to open for changes */
+openarc(int chg)			/* open archive */
 {
-	FILE           *fopen();/* file opener */
+	FILE *fopen();/* file opener */
 
 	if (!(arc = fopen(arcname, OPEN_R))) {
 		if (chg) {
@@ -42,7 +30,7 @@ openarc(chg)			/* open archive */
 				printf("Creating new archive: %s\n", arcname);
 		}
 		else
-			arcdie("Archive not found: %s", arcname);
+			arcdie("Archive not found: %s\n", arcname);
 	}
 #if	_MTS	/* allow reading archives of max MTS record length */
 	{
@@ -58,7 +46,7 @@ openarc(chg)			/* open archive */
 #endif
 	if (chg) {		/* if opening for changes */
 		if (!(new = tmpopen(newname)))
-			arcdie("Cannot create archive copy: %s", newname);
+			arcdie("Cannot create archive copy: %s\n", newname);
 
 	changing = chg;		/* note if open for changes */
 	}
@@ -95,14 +83,14 @@ closearc(chg)			/* close an archive */
 #endif
 			if (keepbak) {	/* if a backup is wanted */
 				unlink(bakname);	/* erase any old copies */
-				if (move(arcname, bakname))
-					arcdie("Cannot rename %s to %s", arcname, bakname);
+				if (fmove(arcname, bakname))
+					arcdie("Cannot rename %s to %s\n", arcname, bakname);
 				printf("Keeping backup archive: %s\n", bakname);
 			} else if (unlink(arcname))
-				arcdie("Cannot delete old archive: %s", arcname);
+				arcdie("Cannot delete old archive: %s\n", arcname);
 		}
-		if (move(newname, arcname))
-			arcdie("Cannot move %s to %s", newname, arcname);
+		if (fmove(newname, arcname))
+			arcdie("Cannot move %s to %s\n", newname, arcname);
 #if	!_MTS
 		setstamp(arcname, arcdate, arctime);
 #endif

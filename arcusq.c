@@ -1,13 +1,11 @@
 /*
- * $Header: /cvsroot/arc/arc/arcusq.c,v 1.2 2003/10/31 02:22:36 highlandsun Exp $
- */
-
-/*
  * ARC - Archive utility - ARCUSQ
  * 
  * Version 3.14, created on 07/25/86 at 13:04:19
  * 
- * (C) COPYRIGHT 1985 by System Enhancement Associates; ALL RIGHTS RESERVED
+ * (C) COPYRIGHT 1985-87 by System Enhancement Associates.
+ * You may copy and distribute this program freely,
+ * under the terms of the General Public License.
  * 
  * By:	Thom Henderson
  * 
@@ -19,12 +17,8 @@
  * 
  * Language: Computer Innovations Optimizing C86
  */
-#include <stdio.h>
 #include "arc.h"
-
 #include "proto.h"
-
-VOID		arcdie();
 
 /* stuff for Huffman unsqueezing */
 
@@ -52,8 +46,7 @@ extern char  *inbeg, *inend;
 	x |= *inbeg++ << 8;}
 
 VOID
-init_usq(f)			/* initialize Huffman unsqueezing */
-	FILE	       *f;	/* file containing squeezed data */
+init_usq(FILE *f)		/* initialize Huffman unsqueezing */
 {
 	int		i;	/* node index */
 	u_int		inlen;
@@ -67,7 +60,7 @@ init_usq(f)			/* initialize Huffman unsqueezing */
 	GET_INT(numnodes);
 
 	if (numnodes < 0 || numnodes >= NUMVALS)
-		arcdie("File has an invalid decode tree");
+		arcdie("File has an invalid decode tree\n");
 
 	/* initialize for possible empty tree (SPEOF only) */
 

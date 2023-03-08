@@ -1,13 +1,11 @@
 /*
- * $Header: /cvsroot/arc/arc/arcrun.c,v 1.8 2005/10/12 15:22:18 highlandsun Exp $
- */
-
-/*
  * ARC - Archive utility - ARCRUN
  * 
  * Version 1.20, created on 03/24/86 at 19:34:31
  * 
- * (C) COPYRIGHT 1985,85 by System Enhancement Associates; ALL RIGHTS RESERVED
+ * (C) COPYRIGHT 1985-87 by System Enhancement Associates.
+ * You may copy and distribute this program freely,
+ * under the terms of the General Public License.
  * 
  * By:  Thom Henderson
  * 
@@ -18,23 +16,18 @@
  * 
  * Language: Computer Innovations Optimizing C86
  */
-#include <stdio.h>
-#include <string.h>
 #include "arc.h"
-#if UNIX
-#include <unistd.h>
-#include <sys/stat.h>
-#endif
 
-VOID	rempath(), openarc(), closearc(), arcdie();
-int	readhdr(), match(), unpack();
+VOID	rempath(), openarc(), closearc();
+int	match(), unpack();
 static	VOID	runfile();
 FILE	*tmpopen();
 
 VOID
-runarc(num, arg)		/* run file from archive */
-	int             num;	/* number of arguments */
-	char           *arg[];	/* pointers to arguments */
+runarc(			/* run file from archive */
+	int	num,	/* number of arguments */
+	char	*arg[]	/* pointers to arguments */
+)
 {
 	struct heads    hdr;	/* file header */
 	char           *makefnam();	/* filename fixer */
@@ -98,7 +91,7 @@ runfile(hdr, num, arg)		/* run a file */
 		strcpy(sys, buf);
 
 	else {
-		if (warn) {
+		if (warns) {
 			printf("File %s is not a .BAS, .BAT, .COM, or .EXE\n",
 			       hdr->name);
 			nerrs++;
@@ -112,7 +105,7 @@ runfile(hdr, num, arg)		/* run a file */
               && strcmp(i, ".TTP")
               && strcmp(i, ".TOS"))
       {
-              if (warn) {
+              if (warns) {
                       printf("File %s is not a .PRG, .TOS, or .TTP\n",
                               hdr->name);
                       nerrs++;
@@ -122,11 +115,11 @@ runfile(hdr, num, arg)		/* run a file */
       }
 #endif
 
-	if (warn)
+	if (warns)
 		if ((tmp = fopen(buf, "r")))
-			arcdie("Temporary file %s already exists", buf);
+			arcdie("Temporary file %s already exists\n", buf);
 	if (!(tmp = tmpopen(buf)))
-		arcdie("Unable to create temporary file %s", buf);
+		arcdie("Unable to create temporary file %s\n", buf);
 
 	if (note)
 		printf("Invoking file: %s\n", hdr->name);
@@ -144,9 +137,9 @@ runfile(hdr, num, arg)		/* run a file */
 		strcat(sys, arg[n]);
 	}
 	if (system(buf))		/* try to invoke it */
-		arcdie("Execution failed for %s", buf);
+		arcdie("Execution failed for %s\n", buf);
 #endif
-	if (unlink(buf) && warn) {
+	if (remove(buf) && warns) {
 		printf("Cannot unsave temporary file %s\n", buf);
 		nerrs++;
 	}

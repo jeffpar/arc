@@ -1,13 +1,11 @@
 /*
- * $Header: /cvsroot/arc/arc/arcadd.c,v 1.4 2005/10/12 15:22:18 highlandsun Exp $
- */
-
-/*
  * ARC - Archive utility - ARCADD
  * 
  * Version 3.40, created on 06/18/86 at 13:10:18
  * 
- * (C) COPYRIGHT 1985,86 by System Enhancement Associates; ALL RIGHTS RESERVED
+ * (C) COPYRIGHT 1985,86 by System Enhancement Associates.
+ * You may copy and distribute this program freely,
+ * under the terms of the General Public License.
  * 
  * By:  Thom Henderson
  * 
@@ -15,24 +13,21 @@
  * 
  * Language: Computer Innovations Optimizing C86
  */
-#include <stdio.h>
 #include "arc.h"
-#if	_MTS
-#include <mts.h>
-#include <ctype.h>
-#endif
-#include <string.h>
-#if	BSD
-#include <strings.h>
-#endif
+	
+int
+addfile(			/* add named file to archive */
+	char	*path,		/* path name of file to add */
+	char	*name,		/* name of file to add */
+	int	update,		/* true if updating */
+	int	fresh		/* true if freshening */
+);
 
-static	int	addfile();
-int	readhdr(), unlink();
 #if	UNIX
 int	izadir();
 #endif
-VOID	writehdr(), filecopy(), getstamp();
-VOID	pack(), closearc(), openarc(), arcdie();
+VOID	getstamp();
+VOID	pack(), closearc(), openarc();
 
 #ifndef	__STDC__
 char           *malloc(), *realloc();	/* memory allocators */
@@ -42,26 +37,27 @@ VOID	free();
 #endif
 
 VOID
-addarc(num, arg, move, update, fresh)		/* add files to archive */
-	int             num;	/* number of arguments */
-	char           *arg[];	/* pointers to arguments */
-int             move;		/* true if moving file */
-int             update;		/* true if updating */
-int             fresh;		/* true if freshening */
+addarc(				/* add files to archive */
+       int	num,		/* number of arguments */
+       char	*arg[],		/* pointers to arguments */
+       int	move,		/* true if moving file */
+       int	update,		/* true if updating */
+       int	fresh		/* true if freshening */
+)
 {
-	char           *d, *dir();	/* directory junk */
-	char            buf[STRLEN];	/* pathname buffer */
-	char          **path;	/* pointer to pointers to paths */
-	char          **name;	/* pointer to pointers to names */
-	int             nfiles = 0;	/* number of files in lists */
-	int             notemp;	/* true until a template works */
-	int             nowork = 1;	/* true until files are added */
-	char           *i;	/* string indexing junk */
-	int             n;	/* index */
+	char	*d, *dir();	/* directory junk */
+	char    buf[STRLEN];	/* pathname buffer */
+	char    **path;		/* pointer to pointers to paths */
+	char    **name;		/* pointer to pointers to names */
+	int     nfiles = 0;	/* number of files in lists */
+	int     notemp;		/* true until a template works */
+	int     nowork = 1;	/* true until files are added */
+	char    *i;		/* string indexing junk */
+	int     n;		/* index */
 #if	MSDOS
-	unsigned int	coreleft();	/* remaining memory reporter */
+	unsigned int coreleft();/* remaining memory reporter */
 #endif
-	int		addbunch();
+	int	addbunch();
 
 	if (num < 1) {		/* if no files named */
 		num = 1;	/* then fake one */
@@ -119,7 +115,7 @@ int             fresh;		/* true if freshening */
 			}
 #endif
 		}
-		if (notemp && warn)
+		if (notemp && warns)
 			printf("No files match: %s\n", arg[n]);
 	}
 
@@ -133,7 +129,7 @@ int             fresh;		/* true if freshening */
 		free(path);
 		free(name);
 	}
-	if (nowork && warn)
+	if (nowork && warns)
 		printf("No files were added.\n");
 }
 
@@ -198,7 +194,7 @@ addbunch(nfiles, path, name, move, update, fresh)	/* add a bunch of files */
 	for (n = 0; n < nfiles - 1; n++) {	/* watch out for duplicate
 						 * names */
 		if (!strcmp(name[n], name[n + 1]))
-			arcdie("Duplicate filenames:\n  %s\n  %s", path[n], path[n + 1]);
+			arcdie("Duplicate filenames:\n  %s\n  %s\n", path[n], path[n + 1]);
 	}
 	openarc(1);		/* open archive for changes */
 
@@ -227,7 +223,7 @@ addbunch(nfiles, path, name, move, update, fresh)	/* add a bunch of files */
 	if (move) {		/* if this was a move */
 		for (n = 0; n < nfiles; n++) {	/* then delete each file
 						 * added */
-			if (unlink(path[n]) && warn) {
+			if (unlink(path[n]) && warns) {
 				printf("Cannot unsave %s\n", path[n]);
 				nerrs++;
 			}
@@ -236,12 +232,13 @@ addbunch(nfiles, path, name, move, update, fresh)	/* add a bunch of files */
 	return nfiles;		/* say how many were added */
 }
 
-static          int
-addfile(path, name, update, fresh)	/* add named file to archive */
-	char           *path;	/* path name of file to add */
-	char           *name;	/* name of file to add */
-	int             update;	/* true if updating */
-	int             fresh;	/* true if freshening */
+int
+addfile(			/* add named file to archive */
+	char	*path,		/* path name of file to add */
+	char	*name,		/* name of file to add */
+	int	update,		/* true if updating */
+	int	fresh		/* true if freshening */
+)
 {
 	struct heads    nhdr;	/* data regarding the new file */
 	struct heads    ohdr;	/* data regarding an old file */
@@ -259,7 +256,7 @@ addfile(path, name, update, fresh)	/* add named file to archive */
 	if (!f)
 #endif
 	{
-		if (warn) {
+		if (warns) {
 			printf("Cannot read file: %s\n", path);
 			nerrs++;
 		}
@@ -267,7 +264,7 @@ addfile(path, name, update, fresh)	/* add named file to archive */
 	}
 #if	!DOS
 	if (strlen(name) >= FNLEN) {
-		if (warn) {
+		if (warns) {
 			char	buf[STRLEN];
 			printf("WARNING: File %s name too long!\n", name);
 			name[FNLEN-1]='\0';

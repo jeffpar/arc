@@ -1,4 +1,3 @@
-# $Header: /cvsroot/arc/arc/Makefile,v 1.9 2011/01/01 13:02:30 k_reimer Exp $
 #       Makefile for portable ARC
 #
 # Originals from Dan Lanciani, James Turner, and others...
@@ -44,7 +43,7 @@ SYSTEM = -DSYSV=1
 OPT = -O -Wall
 # For MWC 3.0 on the Atari ST, use:
 #CFLAGS = -VCOMPAC -VPEEP
-CFLAGS = $(OPT) $(SYSTEM) -DVERSION=\"$(VERSION)\"
+CFLAGS = $(OPT) $(SYSTEM)
 
 # GNU's gcc is very nice, if you've got it. Otherwise just cc.
 #CC = cgcc -mshort -mbaserel
@@ -137,4 +136,4 @@ install: all
 	install -s -m 0755 -D marc $(DESTDIR)$(PREFIX)/bin/marc
 	install -m 0644 -D arc.1 $(DESTDIR)$(PREFIX)/share/man/man1/arc.1
 	install -m 0644 -D marc.1 $(DESTDIR)$(PREFIX)/share/man/man1/marc.1
-	 	
+

@@ -1,12 +1,10 @@
-/*
- * $Header: /cvsroot/arc/arc/arcdata.c,v 1.2 2003/10/31 02:22:36 highlandsun Exp $
- */
-
 /*  ARC - Archive utility - ARCDATA
 
     Version 2.17, created on 04/22/87 at 13:09:43
 
-(C) COPYRIGHT 1985,86 by System Enhancement Associates; ALL RIGHTS RESERVED
+    (C) COPYRIGHT 1985-87 by System Enhancement Associates.
+    You may copy and distribute this program freely,
+    under the terms of the General Public License.
 
     By:	 Thom Henderson
 
@@ -18,9 +16,6 @@
     Language:
 	 Computer Innovations Optimizing C86
 */
-#include <stdio.h>
-
-#define DONT_DEFINE
 #include "arc.h"
 
 int             keepbak = 0;	/* true if saving the old archive */
@@ -35,11 +30,11 @@ char            tmpchr[2] = "-";/* Temporary file prefix */
 #if	GEMDOS
 int		hold = 0;	/* true to pause before exit */
 #endif
-int             warn = 1;	/* true to print warnings */
+int             warns = 1;	/* true to print warnings */
 int             note = 1;	/* true to print comments */
 int             bose = 0;	/* true to be verbose */
 int             nocomp = 0;	/* true to suppress compression */
-int             overlay = 0;	/* true to overlay on extract */
+int             overlays = 0;	/* true to overlay on extract */
 int             kludge = 0;	/* kludge flag */
 char           *arctemp = NULL;	/* arc temp file prefix */
 char           *password = NULL;/* encryption password pointer */

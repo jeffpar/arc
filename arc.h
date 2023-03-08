@@ -1,6 +1,19 @@
-/*
- * $Header: /cvsroot/arc/arc/arc.h,v 1.2 2003/10/31 02:22:36 highlandsun Exp $
- */
+#include <stdio.h>
+#if	UNIX
+#include <sys/types.h>
+#include <sys/stat.h>
+#include <unistd.h>
+#include <errno.h>
+#endif
+
+#include <string.h>
+#if BSD
+#include <strings.h>
+#endif
+
+#if	_MTS
+#include <mts.h>
+#endif
 
 #undef	DOS	/* Just in case... */
 #undef	UNIX
@@ -64,7 +77,9 @@
   
     Version 2.17, created on 04/22/87 at 13:09:43
   
-(C) COPYRIGHT 1985,86 by System Enhancement Associates; ALL RIGHTS RESERVED
+    (C) COPYRIGHT 1985-87 by System Enhancement Associates.
+    You may copy and distribute this program freely,
+    under the terms of the General Public License.
   
     By:	 Thom Henderson
   
@@ -83,6 +98,8 @@
 #define FNLEN 13		/* file name length              */
 #define MAXARG 400		/* maximum number of arguments   */
 
+#include "arcs.h"
+
 #if	!UNIX
 typedef unsigned int	u_int;
 #ifndef	__GNUC__
@@ -91,9 +108,6 @@ typedef unsigned short	u_short;
 #endif
 #endif
 #define	reg	register
-
-#ifndef DONT_DEFINE		/* Defined by arcdata.c */
-#include "arcs.h"
 
 extern int      keepbak;	/* true if saving the old archive */
 #if	!DOS
@@ -106,11 +120,11 @@ extern char     tmpchr[2];	/* Temporary file prefix, default = '-' */
 #if	GEMDOS
 extern int      hold;		/* hold screen before exiting */
 #endif
-extern int      warn;		/* true to print warnings */
+extern int      warns;		/* true to print warnings */
 extern int      note;		/* true to print comments */
 extern int      bose;		/* true to be verbose */
 extern int      nocomp;		/* true to suppress compression */
-extern int      overlay;	/* true to overlay on extract */
+extern int      overlays;	/* true to overlay on extract */
 extern int      kludge;		/* kludge flag */
 extern char    *arctemp;	/* arc temp file prefix */
 extern char    *password;	/* encryption password pointer */
@@ -129,4 +143,88 @@ extern u_short	arctime;	/* archive time stamp */
 extern u_short	olddate;	/* old archive date stamp */
 extern u_short	oldtime;	/* old archive time stamp */
 extern int      dosquash;	/* squash instead of crunch */
-#endif				/* DONT_DEFINE */
+
+#define arcdie(...)  	{ fprintf(stderr, __VA_ARGS__); exit(1); }
+
+#if	!__STDC__
+char		*calloc(), *malloc(), *realloc();
+#endif
+
+VOID addarc(			/* add files to archive */
+	int	num,		/* number of arguments */
+	char	*arg[],		/* pointers to arguments */
+	int	move,		/* true if moving file */
+	int	update,		/* true if updating */
+	int	fresh		/* true if freshening */
+);
+
+VOID
+delarc(				/* remove files from archive */
+	int	num,		/* number of arguments */
+	char    *arg[]		/* pointers to arguments */
+);
+
+VOID
+extarc(				/* extract files from archive */
+	int	num,		/* number of arguments */
+	char	*arg[],		/* pointers to arguments */
+	int	prt		/* true if printing */
+);
+
+VOID
+lstarc(				/* list files in archive */
+	int	num,		/* number of arguments */
+	char	*arg[]		/* pointers to arguments */
+);
+
+VOID	tstarc(void);		/* test archive */
+
+VOID
+cvtarc(				/* convert archive */
+	int	num,		/* number of arguments */
+	char	*arg[]		/* pointers to arguments */
+);
+
+VOID
+runarc(				/* run file from archive */
+	int	num,		/* number of arguments */
+	char	*arg[]		/* pointers to arguments */
+);
+
+VOID
+expandlst(			/* expand an indirect reference */
+	int	n
+);
+
+/* arcio.c */
+
+int
+readhdr(			/* read a header from an archive */
+	ARCHDR	*hdr,		/* storage for header */
+	FILE	*f		/* archive to read header from */
+);
+
+VOID
+writehdr(			/* write a header to an archive */
+	ARCHDR	*hdr,		/* header to write */
+	FILE	*f		/* archive to write to */
+);
+
+VOID
+filecopy(			/* bulk file copier */
+	FILE		*f,	/* files from and to */
+	FILE		*t,
+	long            size	/* bytes to copy */
+);
+
+/* arcmisc.c */
+
+char *
+makefnam(char *rawfn, char *template, char *result);
+
+VOID
+upper(char *string);
+
+#if	_MTS
+VOID	etoa();
+#endif

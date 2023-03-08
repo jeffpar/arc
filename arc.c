@@ -1,12 +1,10 @@
-/*
- * $Header: /cvsroot/arc/arc/arc.c,v 1.7 2011/01/01 13:02:30 k_reimer Exp $
- */
-
 /*  ARC - Archive utility
   
     Version 5.21, created on 04/22/87 at 15:05:21
   
-(C) COPYRIGHT 1985-87 by System Enhancement Associates; ALL RIGHTS RESERVED
+    (C) COPYRIGHT 1985-87 by System Enhancement Associates.
+    You may copy and distribute this program freely,
+    under the terms of the General Public License.
   
     By:	 Thom Henderson
   
@@ -70,37 +68,13 @@
     Language:
 	 Computer Innovations Optimizing C86
 */
-#include <stdio.h>
 #include "arc.h"
 
-#if	UNIX
-#include <sys/types.h>
-#include <sys/stat.h>
-#include <unistd.h>
-#include <errno.h>
-#endif
-
-#include <string.h>
-#if BSD
-#include <strings.h>
-#endif
-
-#if	!__STDC__
-char		*calloc(), *malloc(), *realloc();
-#endif
-
-VOID		addarc(), delarc(), extarc(), lstarc(), tstarc(), cvtarc(), runarc();
-VOID		arcdie();
-static	VOID	expandlst();
-#if	_MTS
-VOID		etoa();
-#endif
 #if	GEMDOS
 long		_stksize = 30720;
 #endif
-char		*makefnam();	/* filename fixup routine */
 
-	/* Block I/O buffers */
+/* Block I/O buffers */
 
 u_char		*pinbuf, *pakbuf, *outbuf, *outend;
 
@@ -108,14 +82,10 @@ static char   **lst;		/* files list */
 static int	lnum;		/* length of files list */
 
 int
-main(num, arg)			/* system entry point */
-	int		num;	/* number of arguments */
-	char	       *arg[];	/* pointers to arguments */
+main(int num, char *arg[])	/* system entry point */
 {
 	char		opt = 0;/* selected action */
 	char	       *a;	/* option pointer */
-	VOID		upper();/* case conversion routine */
-	char	       *envfind();	/* environment searcher */
 	int		n;	/* index */
 	char	       *arctemp2;
 #if	GEMDOS
@@ -131,30 +101,14 @@ main(num, arg)			/* system entry point */
 #endif
 
 	if (num < 3) {
-		printf("ARC - Archive utility, Version %s, created on 08/07/2010\n", VERSION);
-/*		printf("(C) COPYRIGHT 1985,86,87 by System Enhancement Associates;");
-		printf(" ALL RIGHTS RESERVED\n\n");
+		printf("ARC - Archive utility, Version 5.21q, created on 03/08/2023\n");
+/*		printf("(C) COPYRIGHT 1985,86,87 by System Enhancement Associates\n");
 		printf("Please refer all inquiries to:\n\n");
 		printf("       System Enhancement Associates\n");
 		printf("       21 New Street, Wayne NJ 07470\n\n");
 		printf("You may copy and distribute this program freely,");
-		printf(" provided that:\n");
-		printf("    1)	 No fee is charged for such copying and");
-		printf(" distribution, and\n");
-		printf("    2)	 It is distributed ONLY in its original,");
-		printf(" unmodified state.\n\n");
-		printf("If you like this program, and find it of use, then your");
-		printf(" contribution will\n");
-		printf("be appreciated.	 You may not use this product in a");
-		printf(" commercial environment\n");
-		printf("or a governmental organization without paying a license");
-		printf(" fee of $35.  Site\n");
-		printf("licenses and commercial distribution licenses are");
-		printf(" available.  A program\n");
-		printf("disk and printed documentation are available for $50.\n");
-		printf("\nIf you fail to abide by the terms of this license, ");
-		printf(" then your conscience\n");
-		printf("will haunt you for the rest of your life.\n\n"); */
+		printf(" under the terms of the General Public License.\n");
+*/
 #if	MSDOS
 		printf("Usage: ARC {amufdxerplvtc}[bswnoq][g<password>]");
 #endif
@@ -218,7 +172,7 @@ main(num, arg)			/* system entry point */
 	if (arctemp2) {
 		strncpy(arctemp, arctemp2, STRLEN - 16);
 		arctemp[STRLEN - 17] = '\0';
-		n = strlen(arctemp);
+		n = (int)strlen(arctemp);
 		if (arctemp[n - 1] != CUTOFF)
 			arctemp[n] = CUTOFF;
 	}
@@ -292,13 +246,13 @@ main(num, arg)			/* system entry point */
 		if (index("AMUFDXEPLVTC", *a)) {
 #endif
 			if (opt)/* do we have one yet? */
-				arcdie("Cannot mix %c and %c", opt, *a);
+				arcdie("Cannot mix %c and %c\n", opt, *a);
 			opt = *a;	/* else remember it */
 		} else if (*a == 'B')	/* retain backup copy */
 			keepbak = 1;
 
 		else if (*a == 'W')	/* suppress warnings */
-			warn = 0;
+			warns = 0;
 #if	!DOS
 		else if (*a == 'I')	/* image mode, no ASCII/EBCDIC x-late */
 			image = !image;
@@ -312,7 +266,7 @@ main(num, arg)			/* system entry point */
 			note = 0;
 
 		else if (*a == 'O')	/* overwrite file on extract */
-			overlay = 1;
+			overlays = 1;
 
 		else if (*a == 'G') {	/* garble */
 			password = a + 1;
@@ -336,11 +290,11 @@ main(num, arg)			/* system entry point */
 			;
 
 		else
-			arcdie("%c is an unknown command", *a);
+			arcdie("%c is an unknown command\n", *a);
 	}
 
 	if (!opt)
-		arcdie("I have nothing to do!");
+		arcdie("nothing to do\n");
 
 	/* get the files list set up */
 
@@ -375,11 +329,11 @@ main(num, arg)			/* system entry point */
 	/* Allocate space to I/O buffers */
 
 	if (!(pinbuf = malloc(MYBUF)))
-		arcdie("Not enough memory for input buffer.");
+		arcdie("Not enough memory for input buffer\n");
 	if (!(outbuf = malloc(MYBUF)))
-		arcdie("Not enough memory for output buffer.");
+		arcdie("Not enough memory for output buffer\n");
 	if (!(pakbuf = malloc(2L*MYBUF)))
-		arcdie("Not enough memory for packing buffer.");
+		arcdie("Not enough memory for packing buffer\n");
 	outend = outbuf + MYBUF - 1;
 	
 	
@@ -422,7 +376,7 @@ main(num, arg)			/* system entry point */
 		break;
 #endif
 	default:
-		arcdie("I don't know how to do %c yet!", opt);
+		arcdie("I don't know how to do %c yet\n", opt);
 	}
 #if	GEMDOS
 	if (hold)
@@ -430,21 +384,21 @@ main(num, arg)			/* system entry point */
 #endif
 	return nerrs;
 }
-static	VOID
-expandlst(n)			/* expand an indirect reference */
-	int		n;	/* number of entry to expand */
+	
+VOID
+expandlst(int n)			/* expand an indirect reference */
 {
-	FILE	       *lf, *fopen();	/* list file, opener */
+	FILE	       *lf;		/* list file, opener */
 	char		buf[100];	/* input buffer */
-	int		x;	/* index */
+	int		x;		/* index */
 	char	       *p = lst[n] + 1; /* filename pointer */
 
-	if (*p) {		/* use name if one was given */
+	if (*p) {			/* use name if one was given */
 		makefnam(p, ".CMD", buf);
 		if (!(lf = fopen(buf, "r")))
-			arcdie("Cannot read list of files in %s", buf);
+			arcdie("Cannot read list of files in %s\n", buf);
 	} else
-		lf = stdin;	/* else use standard input */
+		lf = stdin;		/* else use standard input */
 
 	for (x = n + 1; x < lnum; x++)	/* drop reference from the list */
 		lst[x - 1] = lst[x];
@@ -452,13 +406,13 @@ expandlst(n)			/* expand an indirect reference */
 
 	while (fscanf(lf, "%99s", buf) > 0) {	/* read in the list */
 		if (!(lst =(char **)realloc(lst, (lnum + 1) * sizeof(char *))))
-			arcdie("too many file references");
+			arcdie("too many file references\n");
 
 		lst[lnum] = malloc(strlen(buf) + 1);
-		strcpy(lst[lnum], buf); /* save the name */
+		strcpy(lst[lnum], buf);	/* save the name */
 		lnum++;
 	}
 
-	if (lf != stdin)	/* avoid closing standard input */
+	if (lf != stdin)		/* avoid closing standard input */
 		fclose(lf);
 }

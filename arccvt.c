@@ -1,13 +1,11 @@
 /*
- * $Header: /cvsroot/arc/arc/arccvt.c,v 1.2 2003/10/31 02:22:36 highlandsun Exp $
- */
-
-/*
  * ARC - Archive utility - ARCCVT
  * 
  * Version 1.16, created on 02/03/86 at 22:53:02
  * 
- * (C) COPYRIGHT 1985 by System Enhancement Associates; ALL RIGHTS RESERVED
+ * (C) COPYRIGHT 1985-87 by System Enhancement Associates.
+ * You may copy and distribute this program freely,
+ * under the terms of the General Public License.
  * 
  * By:  Thom Henderson
  * 
@@ -16,30 +14,24 @@
  * 
  * Language: Computer Innovations Optimizing C86
  */
-#include <stdio.h>
-#if	_MTS
-#include <mts.h>
-#endif
 #include "arc.h"
 
-int	match(), readhdr(), unpack(), unlink();
-VOID	openarc(), rempath(), closearc(), arcdie(), pack();
-VOID	writehdr(), filecopy();
+int	match(), unpack();
+VOID	filecopy(), openarc(), rempath(), closearc(), pack();
 static	VOID	cvtfile();
 
 static char     tempname[STRLEN];	/* temp file name */
 
 VOID
-cvtarc(num, arg)		/* convert archive */
-	int             num;	/* number of arguments */
-	char           *arg[];	/* pointers to arguments */
+cvtarc(				/* convert archive */
+	int	num,		/* number of arguments */
+	char	*arg[]		/* pointers to arguments */
+)
 {
 	struct heads    hdr;	/* file header */
 	int             cvt;	/* true to convert current file */
 	int             did[MAXARG];/* true when argument was used */
 	int             n;	/* index */
-	char           *makefnam();	/* filename fixer */
-	FILE           *fopen();/* file opener */
 
 	if (arctemp)		/* use temp area if specified */
 		sprintf(tempname, "%s.CVT", arctemp);
@@ -96,11 +88,11 @@ static	VOID
 cvtfile(hdr)			/* convert a file */
 	struct heads   *hdr;	/* pointer to header data */
 {
-	long            starts, ftell();	/* where the file goes */
-	FILE           *tmp, *fopen();	/* temporary file */
+	long            starts;	/* where the file goes */
+	FILE           *tmp;	/* temporary file */
 
 	if (!(tmp = fopen(tempname, "w+b")))
-		arcdie("Unable to create temporary file %s", tempname);
+		arcdie("Unable to create temporary file %s\n", tempname);
 
 	if (note) {
 		printf("Converting file: %-12s   reading, ", hdr->name);
@@ -120,7 +112,7 @@ cvtfile(hdr)			/* convert a file */
 	writehdr(hdr, new);	/* write out real header */
 	fseek(new, hdr->size, 1);	/* skip over data to next header */
 	fclose(tmp);		/* all done with the file */
-	if (unlink(tempname) && warn) {
+	if (unlink(tempname) && warns) {
 		printf("Cannot unsave %s\n", tempname);
 		nerrs++;
 	}

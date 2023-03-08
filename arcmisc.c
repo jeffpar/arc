@@ -1,16 +1,10 @@
 /*
  * Miscellaneous routines to get ARC running on non-MSDOS systems...
- * $Header: /cvsroot/arc/arc/arcmisc.c,v 1.4 2005/10/09 01:38:22 highlandsun Exp $ 
+ *
+ * You may copy and distribute this program freely,
+ * under the terms of the General Public License.
  */
-
-#include <stdio.h>
-#include <ctype.h>
 #include "arc.h"
-
-#include <string.h>
-#if	BSD
-#include <strings.h>
-#endif
 
 #if	MSDOS
 #include <dir.h>
@@ -66,7 +60,6 @@ chdir(dirname)
 #define DIRECT direct
 #endif
 #include <sys/stat.h>
-	int	rename(), unlink();
 #include <fcntl.h>
 #endif
 
@@ -95,8 +88,7 @@ int             match();
 
 /* Safe open for temp files */
 FILE *
-tmpopen(path)
-	char *path;
+tmpopen(char *path)
 {
 	int fd = open(path, O_CREAT | O_WRONLY | O_EXCL, S_IRUSR | S_IWUSR);
 	if (fd < 0 )
@@ -105,14 +97,12 @@ tmpopen(path)
 }
 
 int
-move(oldnam, newnam)
-	char           *oldnam, *newnam;
+fmove(char *oldnam, char *newnam)
 {
-	FILE           *fopen(), *old, *new;
+	FILE           *old, *new;
 #if	!_MTS
 	struct stat     oldstat;
 #endif
-	VOID		filecopy();
 #if	GEMDOS
 	if (Frename(0, oldnam, newnam))
 #else
@@ -138,9 +128,7 @@ move(oldnam, newnam)
 }
 
 static VOID
-_makefn(source, dest)
-	char           *source;
-	char           *dest;
+_makefn(char *source, char *dest)
 {
 	int             j;
 #if	MSDOS
@@ -159,11 +147,8 @@ _makefn(source, dest)
  * make a file name using a template 
  */
 
-char           *
-makefnam(rawfn, template, result)
-	char           *rawfn;	/* the original file name */
-	char           *template;	/* the template data */
-	char           *result;	/* where to place the result */
+char *
+makefnam(char *rawfn, char *template, char *result)
 {
 	char            et[17], er[17], rawbuf[STRLEN], *i;
 
@@ -212,38 +197,35 @@ alphasort(dirptr1, dirptr2)
 #endif
 
 VOID
-upper(string)
-	char           *string;
+upper(char *string)
 {
-	char           *p;
-
+	char *p;
 	for (p = string; *p; p++)
 		if (islower(*p))
 			*p = toupper(*p);
 }
+
 /* VARARGS1 */
-VOID
-arcdie(s, arg1, arg2, arg3)
-	char           *s;
-{
-	fprintf(stderr, "ARC: ");
-	fprintf(stderr, s, arg1, arg2, arg3);
-	fprintf(stderr, "\n");
-#if	UNIX
-	perror("UNIX");
-#endif
-#if	GEMDOS
-	exitpause();
-#endif
-	exit(1);
-}
+// VOID
+// arcdie(s, arg1, arg2, arg3)
+//	char           *s;
+// {
+//	fprintf(stderr, "ARC: ");
+//	fprintf(stderr, s, arg1, arg2, arg3);
+//	fprintf(stderr, "\n");
+// #if	UNIX
+//	perror("UNIX");
+// #endif
+// #if	GEMDOS
+//	exitpause();
+// #endif
+//	exit(1);
+// }
 
 #if	!_MTS
 
-char           *
-gcdir(dirname)
-	char           *dirname;
-
+char *
+gcdir(char *dirname)
 {
 	char           *getcwd();
 #if	GEMDOS
@@ -268,9 +250,8 @@ gcdir(dirname)
 char           *pattern;	/* global so that fmatch can use it */
 #endif
 
-char           *
-dir(filename)		/* get files, one by one */
-	char           *filename;	/* template, or NULL */
+char *
+dir(char *filename)		/* get files, one by one */
 {
 #if	GEMDOS
 	static int      Nnum = 0;
@@ -352,8 +333,7 @@ dir(filename)		/* get files, one by one */
  */
 
 int
-fmatch(direntry)
-	struct DIRECT  *direntry;
+fmatch(struct DIRECT *direntry)
 {
 	char           *string;
 
@@ -367,9 +347,8 @@ fmatch(direntry)
 #else
 /* dir code for MTS under Bell Labs C... */
 
-char           *
-dir(filepattern)
-	char           *filepattern;	/* template or NULL */
+char *
+dir(char *filepattern)
 {
 #if	USECATSCAN
 	fortran VOID    catscan(), fileinfo();
@@ -480,8 +459,7 @@ dir(filepattern)
 }
 
 int
-unlink(path)
-	char           *path;	/* name of file to delete */
+unlink(char *path)
 {
 	fortran VOID    destroy();
 	int             RETCODE;

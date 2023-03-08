@@ -6,7 +6,9 @@
   
     Version 2.39, created on 04/22/87 at 13:48:29
   
-(C) COPYRIGHT 1985-87 by System Enhancement Associates; ALL RIGHTS RESERVED
+    (C) COPYRIGHT 1985-87 by System Enhancement Associates.
+    You may copy and distribute this program freely,
+    under the terms of the General Public License.
   
     By:	 Thom Henderson
   
@@ -17,17 +19,17 @@
     Language:
 	 Computer Innovations Optimizing C86
 */
-#include <stdio.h>
 #include "arc.h"
 
-VOID            rempath(), openarc(), closearc();
-int             readhdr(), match();
-static	VOID	lstfile();
+VOID	rempath(), openarc(), closearc();
+int	match();
+VOID	lstfile();
 
 VOID
-lstarc(num, arg)		/* list files in archive */
-	int             num;	/* number of arguments */
-	char           *arg[];	/* pointers to arguments */
+lstarc(				/* list files in archive */
+	int	num,		/* number of arguments */
+	char	*arg[]		/* pointers to arguments */
+)
 {
 	struct heads    hdr;	/* header data */
 	int             list;	/* true to list a file */
@@ -119,34 +121,33 @@ lstarc(num, arg)		/* list files in archive */
 	}
 }
 
-static	VOID
-lstfile(hdr)			/* tell about a file */
-	struct heads   *hdr;	/* pointer to header data */
+VOID
+lstfile(struct heads *hdr)		/* tell about a file */
 {
 	int             yr, mo, dy;	/* parts of a date */
-	int             hh, mm;	/* parts of a time */
+	int             hh, mm;		/* parts of a time */
 
-	static char    *mon[] =	/* month abbreviations */
-	{"???",			/* For month == 0 */
+	static char    *mon[] =		/* month abbreviations */
+	{"???",				/* For month == 0 */
 	 "Jan", "Feb", "Mar", "Apr",
 	 "May", "Jun", "Jul", "Aug",
 	 "Sep", "Oct", "Nov", "Dec"
 	};
 
-	if (!note) {		/* no notes means short listing */
+	if (!note) {			/* no notes means short listing */
 		printf("%s\n", hdr->name);
 		return;
 	}
 
 	yr = (hdr->date >> 9) & 0x7f;	/* dissect the date */
 	mo = (hdr->date >> 5) & 0x0f;
-	if (mo > 12)		/* just in case... */
+	if (mo > 12)			/* just in case... */
 		mo = 0;
 	dy = hdr->date & 0x1f;
 
 	hh = (hdr->time >> 11) & 0x1f;	/* dissect the time */
 	mm = (hdr->time >> 5) & 0x3f;
-/*	ss = (hdr->time & 0x1f) * 2;	seconds, not used. */
+/*	ss = (hdr->time & 0x1f) * 2; */	/* seconds, not used */
 
 	printf("%-12s  %8ld  ", hdr->name, hdr->length);
 

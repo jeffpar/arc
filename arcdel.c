@@ -1,13 +1,11 @@
 /*
- * $Header: /cvsroot/arc/arc/arcdel.c,v 1.2 2003/10/31 02:22:36 highlandsun Exp $
- */
-
-/*
  * ARC - Archive utility - ARCDEL
  * 
  * Version 2.09, created on 02/03/86 at 22:53:27
  * 
- * (C) COPYRIGHT 1985 by System Enhancement Associates; ALL RIGHTS RESERVED
+ * (C) COPYRIGHT 1985-87 by System Enhancement Associates.
+ * You may copy and distribute this program freely,
+ * under the terms of the General Public License.
  * 
  * By:  Thom Henderson
  * 
@@ -16,16 +14,16 @@
  * 
  * Language: Computer Innovations Optimizing C86
  */
-#include <stdio.h>
 #include "arc.h"
 
-VOID	arcdie(), rempath(), openarc(), closearc(), writehdr(), filecopy();
-int	match(), readhdr();
+VOID rempath(), openarc(), closearc();
+int	match();
 
 VOID
-delarc(num, arg)		/* remove files from archive */
-	int             num;	/* number of arguments */
-	char           *arg[];	/* pointers to arguments */
+delarc(				/* remove files from archive */
+	int	num,		/* number of arguments */
+	char    *arg[]		/* pointers to arguments */
+)
 {
 	struct heads    hdr;	/* header data */
 	int             del;	/* true to delete a file */
@@ -33,7 +31,7 @@ delarc(num, arg)		/* remove files from archive */
 	int             n;	/* index */
 
 	if (!num)		/* she must specify which */
-		arcdie("You must tell me which files to delete!");
+		arcdie("Please indicate which files to delete\n");
 
 	for (n = 0; n < num; n++)	/* for each argument */
 		did[n] = 0;	/* reset usage flag */

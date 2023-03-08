@@ -1,13 +1,11 @@
 /*
- * $Header: /cvsroot/arc/arc/arcmatch.c,v 1.2 2003/10/31 02:22:36 highlandsun Exp $
- */
-
-/*
  * ARC - Archive utility - ARCMATCH
  * 
  * Version 2.17, created on 12/17/85 at 20:32:18
  * 
- * (C) COPYRIGHT 1985 by System Enhancement Associates; ALL RIGHTS RESERVED
+ * (C) COPYRIGHT 1985-87 by System Enhancement Associates.
+ * You may copy and distribute this program freely,
+ * under the terms of the General Public License.
  * 
  * By:  Thom Henderson
  * 
@@ -16,20 +14,10 @@
  * 
  * Language: Computer Innovations Optimizing C86
  */
-#include <stdio.h>
 #include "arc.h"
 
-#include <string.h>
-#if	BSD
-#include <strings.h>
-#endif
-
-VOID	arcdie();
-
 int
-match(n, t)			/* test name against template */
-	char           *n;	/* name to test */
-	char           *t;	/* template to test against */
+match(char *n, char *t)	/* test name against template */
 {
 #if	_MTS
 	fortran         patbuild(), patmatch(), patfree();
@@ -49,7 +37,7 @@ match(n, t)			/* test name against template */
 		patbuild(oldtemp, &patlen, &patwork, &patswch, patccid, patchar, _retcode RETCODE);
 		if (RETCODE > 8) {
 			printf("MTS: patbuild returned %d\n", RETCODE);
-			arcdie("bad wildcard in filename");
+			arcdie("bad wildcard in filename\n");
 		}
 	}
 	namlen = strlen(n);
@@ -60,7 +48,7 @@ match(n, t)			/* test name against template */
 	case 4:
 		return (0);
 	default:
-		arcdie("wildcard pattern match failed");
+		arcdie("wildcard pattern match failed\n");
 	}
 }
 

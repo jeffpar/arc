@@ -1,10 +1,10 @@
-Unreleased changes:
+                        CHANGES IN VERSION 5.21q
+        (Anibal Monsalve Salazar <anibal@debian.org>, 27 Jun 2013)
 
-Klaus Reimer <k@ailis.de>, 01 Jan 2011:
-  * Corrected spelling error in arc man page.
-  * Version in binaries now comes from VERSION variable in Makefile.
-  * Changed man page sections from 1L to 1.
-
+Relicense under the terms of the General Public License.  See:
+  - http://bugs.debian.org/cgi-bin/bugreport.cgi?bug=641449
+  - https://bugzilla.redhat.com/show_bug.cgi?id=947786
+Remove old csv header lines
 
                         CHANGES IN VERSION 5.21p
                  (Klaus Reimer <k@ailis.de>, 07 Aug 2010)

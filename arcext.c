@@ -1,13 +1,11 @@
 /*
- * $Header: /cvsroot/arc/arc/arcext.c,v 1.5 2005/10/12 15:22:18 highlandsun Exp $
- */
-
-/*
  * ARC - Archive utility - ARCEXT
  * 
  * Version 2.19, created on 10/24/86 at 14:53:32
  * 
- * (C) COPYRIGHT 1985 by System Enhancement Associates; ALL RIGHTS RESERVED
+ * (C) COPYRIGHT 1985-87 by System Enhancement Associates.
+ * You may copy and distribute this program freely,
+ * under the terms of the General Public License.
  * 
  * By:  Thom Henderson
  * 
@@ -16,18 +14,10 @@
  * 
  * Language: Computer Innovations Optimizing C86
  */
-#include <stdio.h>
 #include "arc.h"
-#if	!MSDOS
-#include <ctype.h>
-#endif
-#include <string.h>
-#if	BSD
-#include <strings.h>
-#endif
 
 VOID	openarc(), closearc(), setstamp();
-int	match(), readhdr(), unpack();
+int	match(), unpack();
 static	VOID	extfile();
 
 #ifndef	__STDC__
@@ -38,10 +28,11 @@ VOID	free();
 #endif
 
 VOID
-extarc(num, arg, prt)		/* extract files from archive */
-	int             num;	/* number of arguments */
-	char           *arg[];	/* pointers to arguments */
-	int             prt;		/* true if printing */
+extarc(				/* extract files from archive */
+	int             num,	/* number of arguments */
+	char           *arg[],	/* pointers to arguments */
+	int		prt	/* true if printing */
+)
 {
 	struct heads    hdr;	/* file header */
 	int             save;	/* true to save current file */
@@ -143,7 +134,7 @@ extfile(hdr, path, prt)		/* extract a file */
 	if (note)
 		printf("Extracting file: %s\n", fix);
 
-	if (warn && !overlay) {
+	if (warns && !overlays) {
 		if ((f = fopen(fix, "r"))) {	/* see if it exists */
 				fclose(f);
 				printf("WARNING: File %s already exists!", fix);
@@ -191,7 +182,7 @@ extfile(hdr, path, prt)		/* extract a file */
 	if (!f)
 #endif
 	{
-		if (warn) {
+		if (warns) {
 			printf("Cannot create %s\n", fix);
 			nerrs++;
 		}

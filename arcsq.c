@@ -1,13 +1,11 @@
 /*
- * $Header: /cvsroot/arc/arc/arcsq.c,v 1.2 2003/10/31 02:22:36 highlandsun Exp $
- */
-
-/*
  * ARC - Archive utility - ARCSQ
  *
  * Version 3.10, created on 01/30/86 at 20:10:46
  *
- * (C) COPYRIGHT 1985 by System Enhancement Associates; ALL RIGHTS RESERVED
+ * (C) COPYRIGHT 1985-87 by System Enhancement Associates.
+ * You may copy and distribute this program freely,
+ * under the terms of the General Public License.
  *
  * By:	Thom Henderson
  *
@@ -20,9 +18,7 @@
  * algorithm were lifted from the SQ program by Dick Greenlaw, as adapted to
  * CI-C86 by Robert J. Beilstein.
  */
-#include <stdio.h>
 #include "arc.h"
-
 #include "proto.h"
 
 /* stuff for Huffman squeezing */

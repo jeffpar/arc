@@ -1,12 +1,10 @@
-/*
- * $Header: /cvsroot/arc/arc/arcio.c,v 1.4 2005/10/12 15:22:18 highlandsun Exp $
- */
-
 /*  ARC - Archive utility - ARCIO
 
     Version 2.50, created on 04/22/87 at 13:25:20
 
-(C) COPYRIGHT 1985,86 by System Enhancement Associates; ALL RIGHTS RESERVED
+    (C) COPYRIGHT 1985-87 by System Enhancement Associates.
+    You may copy and distribute this program freely,
+    under the terms of the General Public License.
 
     By:	 Thom Henderson
 
@@ -17,19 +15,13 @@
     Language:
 	 Computer Innovations Optimizing C86
 */
-#include <stdio.h>
 #include "arc.h"
-#if	_MTS
-#include <mts.h>
-#endif
-#include <string.h>
-
-VOID	arcdie();
 
 int
-readhdr(hdr, f)			/* read a header from an archive */
-	struct heads   *hdr;	/* storage for header */
-	FILE           *f;	/* archive to read header from */
+readhdr(			/* read a header from an archive */
+	ARCHDR		*hdr,	/* storage for header */
+	FILE		*f	/* archive to read header from */
+)
 {
 #if	!MSDOS
 	unsigned char   dummy[28];
@@ -46,7 +38,7 @@ readhdr(hdr, f)			/* read a header from an archive */
 		return 0;	/* then signal end of archive */
 
 	if (hdrver != ARCMARK) {	/* check archive validity */
-		if (warn) {
+		if (warns) {
 			printf("An entry in %s has a bad header.\n", arcname);
 			nerrs++;
 		}
@@ -65,48 +57,48 @@ readhdr(hdr, f)			/* read a header from an archive */
 		}
 
 		if (feof(f) && first)
-			arcdie("%s is not an archive", arcname);
+			arcdie("%s is not an archive\n", arcname);
 
-		if (changing && warn)
-			arcdie("%s is corrupted -- changes disallowed", arcname);
+		if (changing && warns)
+			arcdie("%s is corrupted -- changes disallowed\n", arcname);
 
-		if (warn)
-			printf("  %d bytes skipped.\n", try);
+		if (warns)
+			printf("  %d bytes skipped\n", try);
 
 		if (feof(f))
 			return 0;
 	}
 	hdrver = fgetc(f);	/* get header version */
 	if (hdrver & 0x80)	/* sign bit? negative? */
-		arcdie("Invalid header in archive %s", arcname);
+		arcdie("Invalid header in archive %s\n", arcname);
 	if (hdrver == 0)
 		return 0;	/* note our end of archive marker */
 	if (hdrver > ARCVER) {
 		if (fread(name, sizeof(char), FNLEN, f) != FNLEN)
-			arcdie("%s was truncated", arcname);
+			arcdie("%s was truncated\n", arcname);
 #if	_MTS
 		atoe(name, strlen(name));
 #endif
 		printf("I don't know how to handle file %s in archive %s\n",
 		       name, arcname);
-		printf("I think you need a newer version of ARC.\n");
+		printf("You may need a newer version of ARC\n");
 		exit(1);
 	}
 	/* amount to read depends on header type */
 
 	if (hdrver == 1) {	/* old style is shorter */
 		if (fread(hdr, sizeof(struct heads) - sizeof(long int), 1, f) != 1)
-			arcdie("%s was truncated", arcname);
+			arcdie("%s was truncated\n", arcname);
 		hdrver = 2;	/* convert header to new format */
 		hdr->length = hdr->size;	/* size is same when not
 						 * packed */
 	} else
 #if	MSDOS
 		if (fread(hdr, sizeof(struct heads), 1, f) != 1)
-			arcdie("%s was truncated", arcname);
+			arcdie("%s was truncated\n", arcname);
 #else
 		if (fread(dummy, 27, 1, f) != 1)
-			arcdie("%s was truncated", arcname);
+			arcdie("%s was truncated\n", arcname);
 
 	for (i = 0; i < FNLEN; hdr->name[i] = dummy[i], i++);
 #if	_MTS
@@ -147,9 +139,10 @@ put_long(number, f)		/* write a 4 byte integer */
 }
 
 VOID
-writehdr(hdr, f)		/* write a header to an archive */
-	struct heads   *hdr;	/* header to write */
-	FILE           *f;	/* archive to write to */
+writehdr(			/* write a header to an archive */
+	ARCHDR		*hdr,	/* header to write */
+	FILE		*f	/* archive to write to */
+)
 {
 	fputc(ARCMARK, f);		/* write out the mark of ARC */
 	fputc(hdrver, f);	/* write out the header version */
@@ -157,14 +150,14 @@ writehdr(hdr, f)		/* write a header to an archive */
 		return;		/* then write no more */
 #if	MSDOS
 	if (fwrite(hdr, sizeof(struct heads), 1, f) != 1)
-		arcdie("%s out of space", arcname);
+		arcdie("%s out of space\n", arcname);
 #else
 	/* byte/word ordering hassles... */
 #if	_MTS
 	etoa(hdr->name, strlen(hdr->name));
 #endif
 	if (fwrite(hdr->name, 1, FNLEN, f) != FNLEN)
-		arcdie("%s out of space", arcname);
+		arcdie("%s out of space\n", arcname);
 	put_long(hdr->size, f);
 	put_int(hdr->date, f);
 	put_int(hdr->time, f);
@@ -228,7 +221,7 @@ filecopy(f, t, size)		/* bulk file copier */
 		reg.cx = bufl < size ? bufl : size;	/* amount to read */
 		reg.dx = pinbuf;
 		if (sysint21(&reg, &reg) & 1)
-			arcdie("Read fail");
+			arcdie("Read failure\n");
 
 		cpy = reg.ax;	/* amount actually read */
 		reg.ax = 0x4000;/* write to handle */
@@ -238,7 +231,7 @@ filecopy(f, t, size)		/* bulk file copier */
 		sysint21(&reg, &reg);
 
 		if (reg.ax != cpy)
-			arcdie("Write fail (disk full?)");
+			arcdie("Write failure (disk full?)\n");
 
 		size -= (long) cpy;
 	}
@@ -246,9 +239,11 @@ filecopy(f, t, size)		/* bulk file copier */
 #else
 
 VOID
-filecopy(f, t, size)		/* bulk file copier */
-	FILE           *f, *t;	/* files from and to */
-	long            size;	/* bytes to copy */
+filecopy(			/* bulk file copier */
+	FILE		*f,	/* files from and to */
+	FILE		*t,
+	long            size	/* bytes to copy */
+)
 {
 	unsigned int    bufl;	/* buffer length */
 	unsigned int    cpy;	/* bytes being copied */
@@ -258,12 +253,12 @@ filecopy(f, t, size)		/* bulk file copier */
 	while (size > 0) {
 		cpy = fread(pinbuf, sizeof(char), bufl, f);
 		if (fwrite(pinbuf, sizeof(char), cpy, t) != cpy)
-			arcdie("Write fail (no space?)");
+			arcdie("Write failure (no space?)\n");
 		size -= cpy;
 		if (bufl > size)
 			bufl = size;
 		if (ferror(f))
-			arcdie("Unexpected EOF copying archive");
+			arcdie("Unexpected EOF copying archive\n");
 		if (!cpy) break;
 	}
 }

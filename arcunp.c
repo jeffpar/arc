@@ -1,13 +1,11 @@
 /*
- * $Header: /cvsroot/arc/arc/arcunp.c,v 1.2 2003/10/31 02:22:36 highlandsun Exp $
- */
-
-/*
  * ARC - Archive utility - ARCUNP
  * 
  * Version 3.17, created on 02/13/86 at 10:20:08
  * 
- * (C) COPYRIGHT 1985 by System Enhancement Associates; ALL RIGHTS RESERVED
+ * (C) COPYRIGHT 1985-87 by System Enhancement Associates.
+ * You may copy and distribute this program freely,
+ * under the terms of the General Public License.
  * 
  * By:  Thom Henderson
  * 
@@ -16,14 +14,9 @@
  * 
  * Language: Computer Innovations Optimizing C86
  */
-#include <stdio.h>
 #include "arc.h"
-#if	_MTS
-#include <mts.h>
-#endif
 
-VOID	setcode(), init_usq(), init_ucr(), decomp();
-VOID	arcdie(), codebuf();
+VOID	setcode(), init_usq(), init_ucr(), decomp(), codebuf();
 
 #include "proto.h"
 
@@ -39,8 +32,8 @@ extern int	lastc;
 #define NOHIST 0		/* no relevant history */
 #define INREP 1			/* sending a repeated value */
 
-short    crcval;		/* CRC check value */
-long     stdlen;		/* bytes to read */
+extern short crcval;	/* CRC check value */
+extern long stdlen;		/* bytes to read */
 #if	!DOS
 static int	gotcr;		/* got a carriage return? */
 #endif
@@ -122,7 +115,7 @@ unpack(f, t, hdr)		/* unpack an archive entry */
 		break;
 
 	default:		/* unknown method */
-		if (warn) {
+		if (warns) {
 			printf("I don't know how to unpack file %s\n", hdr->name);
 			printf("I think you need a newer version of ARC\n");
 			nerrs++;
@@ -134,7 +127,7 @@ unpack(f, t, hdr)		/* unpack an archive entry */
 	/* cleanups common to all methods */
 
 	if (crcval != hdr->crc) {
-		if (warn || kludge) {
+		if (warns || kludge) {
 			printf("WARNING: File %s fails CRC check\n", hdr->name);
 			nerrs++;
 		}
@@ -184,7 +177,7 @@ putb_unp(buf, len, t)
 #endif	/* !DOS */
 	i=fwrite(buf, 1, len, t);
 	if (i != len)
-		arcdie("Write fail");
+		arcdie("Write failure\n");
 }
 
 /*

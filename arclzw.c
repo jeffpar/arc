@@ -1,13 +1,11 @@
 /*
- * $Header: /cvsroot/arc/arc/arclzw.c,v 1.3 2005/10/08 20:24:37 highlandsun Exp $
- */
-
-/*
  * ARC - Archive utility - ARCLZW
  *
  * Version 2.03, created on 10/24/86 at 11:46:22
  *
- * (C) COPYRIGHT 1985,86 by System Enhancement Associates; ALL RIGHTS RESERVED
+ * (C) COPYRIGHT 1985-87 by System Enhancement Associates.
+ * You may copy and distribute this program freely,
+ * under the terms of the General Public License.
  *
  * By:  Thom Henderson
  *
@@ -30,11 +28,8 @@
  *
  * if <string> <char> is in the table then <string> is in the table.
  */
-#include <stdio.h>
-#include <stdlib.h>
 #include "arc.h"
 
-VOID            arcdie();
 #if	MSDOS
 char           *setmem();
 #else
@@ -56,15 +51,15 @@ static VOID     putcode();
 #define EMPTY    0xFFFF
 #define NOT_FND  0xFFFF
 
-extern u_char	*pinbuf;
-u_char		*inbeg, *inend;
-u_char          *outbuf;
-u_char          *outbeg, *outend; 
+extern u_char *pinbuf;
+extern u_char *outbuf;
+extern u_char *outend;
+u_char *inbeg, *inend, *outbeg;
 
 static int      sp;		/* current stack pointer */
 static int	inflag;
 
-static struct entry {		/* string table entry format */
+static struct st_entry {		/* string table entry format */
 	char            used;	/* true when this entry is in use */
 	u_char           follower;	/* char following string */
 	u_short          next;	/* ptr to next in collision list */
@@ -355,13 +350,13 @@ inittabs()
 {
 	if (!htab) {
 		if (!(htab = (long *)malloc(SQHSIZE * sizeof(long))))
-			arcdie("Not enough memory for crunch table.");
+			arcdie("Not enough memory for crunch table\n");
 		if (!(codetab = (u_short *)malloc(SQHSIZE * sizeof(u_short))))
-			arcdie("Not enough memory for crunch code table.");
+			arcdie("Not enough memory for crunch code table\n");
 		prefix = codetab;
 		suffix = (u_char *)htab;
 		stack = (u_char *) & htab[1 << SQBITS];
-		string_tab = (struct entry *) htab;
+		string_tab = (struct st_entry *) htab;
 	}
 }
 
@@ -518,7 +513,7 @@ decomp(squash, f, t)		/* decompress a file */
 		Bits = CRBITS;
 		output = putb_ncr;
 		if ((code = *inbeg++) != CRBITS)
-			arcdie("File packed with %d bits, I can only handle %d",
+			arcdie("File packed with %d bits, I can only handle %d\n",
 			      code, CRBITS);
 	}
 
@@ -560,7 +555,7 @@ decomp(squash, f, t)		/* decompress a file */
 		 */
 		if (code >= free_ent) {
 			if (code > free_ent) {
-				if (warn) {
+				if (warns) {
 					printf("Corrupted compressed file.\n");
 					printf("Invalid code %d when max is %d.\n",
 					       code, free_ent);
@@ -683,7 +678,7 @@ hash(pred, foll)		/* find spot in the string table */
 	u_char           foll;	/* char following string */
 {
 	u_short          local, tempnext;	/* scratch storage */
-	struct entry   *ep;	/* allows faster table handling */
+	struct st_entry   *ep;	/* allows faster table handling */
 
 	local = (*h) (pred, foll);	/* get initial hash value */
 
@@ -731,7 +726,7 @@ init_tab()
 {				/* set ground state in hash table */
 	unsigned int    i;	/* table index */
 
-	setmem((char *) string_tab, TABSIZE * sizeof(struct entry), 0);
+	setmem((char *) string_tab, TABSIZE * sizeof(struct st_entry), 0);
 
 	for (i = 0; i < 256; i++)	/* list all single byte strings */
 		upd_tab(NO_PRED, i);
@@ -748,7 +743,7 @@ upd_tab(pred, foll)		/* add an entry to the table */
 	u_short          pred;	/* code for preceeding string */
 	u_short          foll;	/* character which follows string */
 {
-	struct entry   *ep;	/* pointer to current entry */
+	struct st_entry   *ep;	/* pointer to current entry */
 
 	/* calculate offset just once */
 
@@ -812,7 +807,7 @@ getb_ucr(f)			/* get next uncrunched byte */
 	FILE           *f;	/* file containing crunched data */
 {
 	int             code, newcode;
-	struct entry   *ep;	/* allows faster table handling */
+	struct st_entry   *ep;	/* allows faster table handling */
 	u_int		len;
 
 	do {

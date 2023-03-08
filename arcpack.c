@@ -1,12 +1,10 @@
-/*
- * $Header: /cvsroot/arc/arc/arcpack.c,v 1.3 2005/10/09 02:14:47 highlandsun Exp $
- */
-
 /*  ARC - Archive utility - ARCPACK
 
     Version 3.49, created on 04/21/87 at 11:26:51
 
-(C) COPYRIGHT 1985-87 by System Enhancement Associates; ALL RIGHTS RESERVED
+    (C) COPYRIGHT 1985-87 by System Enhancement Associates.
+    You may copy and distribute this program freely,
+    under the terms of the General Public License.
 
     By:	 Thom Henderson
 
@@ -17,17 +15,12 @@
     Language:
 	 Computer Innovations Optimizing C86
 */
-#include <stdio.h>
 #include "arc.h"
-#if	_MTS
-#include <ctype.h>
-#endif
-
 #include "proto.h"
 
 VOID		setcode(), init_cm(), codebuf();
-VOID		arcdie(), init_sq(), flsh_cm();
-int		crcbuf();
+VOID		init_sq(), flsh_cm();
+int			crcbuf();
 u_int		ncr_buf();
 
 int		lastc;
@@ -296,6 +289,6 @@ putb_pak(buf, len, f)
 			codebuf(buf, len);
 		i = fwrite(buf, 1, len, f);
 		if (i != len)
-			arcdie("Write failed");
+			arcdie("Write failure\n");
 	}
 }
